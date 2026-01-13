@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="100" height="100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9333ea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Hexagon background -->
+  <path d="M 512 100 L 850 300 L 850 700 L 512 900 L 174 700 L 174 300 Z" 
+        fill="none" stroke="url(#grad1)" stroke-width="20" opacity="0.8"/>
+  
+  <!-- Inner hexagon -->
+  <path d="M 512 150 L 800 330 L 800 670 L 512 850 L 224 670 L 224 330 Z" 
+        fill="#1f2937" opacity="0.9"/>
+  
+  <!-- Text BLACK -->
+  <text x="512" y="450" font-family="Arial, sans-serif" font-size="120" font-weight="bold" 
+        fill="white" text-anchor="middle">BLACK</text>
+  
+  <!-- Text VENOM -->
+  <text x="512" y="580" font-family="Arial, sans-serif" font-size="120" font-weight="bold" 
+        fill="white" text-anchor="middle">VENOM</text>
+  
+  <!-- Snake/Venom accent -->
+  <path d="M 450 380 Q 480 360 510 380 Q 540 360 570 380" 
+        fill="none" stroke="#ef4444" stroke-width="8" opacity="0.8"/>
+</svg>

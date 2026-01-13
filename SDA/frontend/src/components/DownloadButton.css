@@ -1,0 +1,184 @@
+/* Animated Download Button with Skew Effect */
+.download-btn {
+  position: relative;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  border-radius: 0.8em;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(to right, #2563eb, #1d4ed8); /* Blue gradient */
+  color: white;
+  overflow: hidden;
+  margin: 0.25rem;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.5);
+  transition: transform 0.3s ease-in-out;
+}
+
+.download-button::before {
+  position: absolute;
+  content: attr(data-tooltip);
+  width: var(--tooltip-width);
+  height: var(--tooltip-height);
+  background-color: var(--tooltip-color);
+  font-size: 0.9rem;
+  color: #111;
+  border-radius: 0.25em;
+  line-height: var(--tooltip-height);
+  bottom: calc(var(--height) + var(--gap-between-tooltip-to-button) + 10px);
+  left: calc(50% - var(--tooltip-width) / 2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.download-button::after {
+  position: absolute;
+  content: '';
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-top-color: var(--tooltip-color);
+  left: calc(50% - 10px);
+  bottom: calc(100% + var(--gap-between-tooltip-to-button) - 10px);
+}
+
+.download-button::after,
+.download-button::before {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s;
+}
+
+.download-button-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-button-wrapper,
+.download-button-text,
+.download-button-icon {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  color: #fff;
+}
+
+.download-button-text {
+  top: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.download-button-text,
+.download-button-icon {
+  transition: top 0.5s;
+}
+
+.download-button-icon {
+  color: #fff;
+  top: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-button-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.download-button:hover {
+  background: #6c18ff;
+}
+
+.download-button:hover .download-button-text {
+  top: -100%;
+}
+
+.download-button:hover .download-button-icon {
+  top: 0;
+}
+
+.download-button:hover:before,
+.download-button:hover:after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.download-button:hover:after {
+  bottom: calc(var(--height) + var(--gap-between-tooltip-to-button) - 20px);
+}
+
+.download-button:hover:before {
+  bottom: calc(var(--height) + var(--gap-between-tooltip-to-button));
+}
+
+/* Run Button Styles */
+.run-button {
+  --width: 100px;
+  --height: 40px;
+  width: var(--width);
+  height: var(--height);
+  background: #16a34a;
+  position: relative;
+  text-align: center;
+  border-radius: 0.45em;
+  font-family: "Arial";
+  transition: background 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.run-button-wrapper,
+.run-button-text,
+.run-button-icon {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  color: #fff;
+}
+
+.run-button-text {
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.run-button-text,
+.run-button-icon {
+  transition: top 0.5s;
+}
+
+.run-button-icon {
+  color: #fff;
+  top: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.run-button-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.run-button:hover {
+  background: #15803d;
+}
+
+.run-button:hover .run-button-text {
+  top: -100%;
+}
+
+.run-button:hover .run-button-icon {
+  top: 0;
+}
