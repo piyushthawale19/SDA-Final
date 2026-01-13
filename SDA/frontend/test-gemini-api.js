@@ -1,7 +1,7 @@
 // Test Gemini API Endpoint
 // Run this in browser console to test different endpoints
 
-const apiKey = "AIzaSyC60wZbiox7ZZdso8rU-ujqz7ydJ7a3f_Q";
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 const endpoints = [
   // Option 1: v1 with gemini-1.5-flash
