@@ -60,7 +60,7 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:ge
 Open DevTools (F12) → Console tab → Paste this code:
 
 ```javascript
-const apiKey = "AIzaSyC60wZbiox7ZZdso8rU-ujqz7ydJ7a3f_Q";
+const apiKey = "";
 
 fetch(
   `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
