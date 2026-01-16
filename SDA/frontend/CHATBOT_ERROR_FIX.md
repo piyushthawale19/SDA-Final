@@ -34,7 +34,7 @@ The chatbot had **two issues**:
 1. Open: `d:\Downloads\Desktop\Final Year2\SDA\frontend\.env`
 2. Replace `your_gemini_api_key_here` with your actual API key:
    ```env
-   VITE_GEMINI_API_KEY=AIzaSyC60wZbiox7ZZdso8rU-ujqz7ydJ7a3f_Q
+   VITE_GEMINI_API_KEY= 
    ```
 
 ### **Step 3: Restart Your Dev Server**
