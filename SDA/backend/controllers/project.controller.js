@@ -104,3 +104,18 @@ export const updateFileTree = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+// Delete project
+export const deleteProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const loggedInUser = await userModel.findOne({ email: req.user.email });
+    if (!loggedInUser) return res.status(404).json({ error: "User not found" });
+
+    const result = await projectService.deleteProject({ projectId, userId: loggedInUser._id });
+    return res.status(200).json({ message: "Project deleted", result });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ error: error.message });
+  }
+};

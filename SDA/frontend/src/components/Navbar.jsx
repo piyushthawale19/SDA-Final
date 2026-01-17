@@ -74,27 +74,39 @@ const Navbar = () => {
         </div>
 
 
-      {/* Right: Profile */}
-      <div className="relative" ref={menuRef}>
+      {/* Right: Actions & Profile */}
+      <div className="flex items-center gap-3">
         <button
-          className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
-          onClick={() => setMenuOpen(!menuOpen)}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-gradient-to-r from-gray-800 to-gray-700 dark:from-gray-700 dark:to-gray-600 text-white hover:scale-105 transform transition-shadow duration-150 shadow-md hover:shadow-lg ring-0 focus:outline-none focus:ring-2 focus:ring-purple-400/30"
+          title="Publish to GitHub"
+          aria-label="Publish to GitHub"
+          onClick={() => document.dispatchEvent(new CustomEvent("push-to-github"))}
         >
-          <img
-            src={user?.avatar || "/avatars/default1.png"}
-            alt="avatar"
-            className="w-8 h-8 rounded-md object-cover border"
-          />
-          <span className="hidden sm:block text-sm font-medium dark:text-white">
-            {user?.name
-              ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
-              : user?.email
-              ? user.email.split("@")[0].charAt(0).toUpperCase() +
-                user.email.split("@")[0].slice(1)
-              : "Guest"}
-          </span>
+          <i className="ri-github-fill text-lg" aria-hidden="true" />
+          <span className="hidden md:inline text-sm font-medium">Publish</span>
         </button>
-        {menuOpen && <ProfileMenu user={user} />}
+
+        <div className="relative" ref={menuRef}>
+          <button
+            className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <img
+              src={user?.avatar || "/avatars/default1.png"}
+              alt="avatar"
+              className="w-8 h-8 rounded-md object-cover border"
+            />
+            <span className="hidden sm:block text-sm font-medium dark:text-white">
+              {user?.name
+                ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
+                : user?.email
+                ? user.email.split("@")[0].charAt(0).toUpperCase() +
+                  user.email.split("@")[0].slice(1)
+                : "Guest"}
+            </span>
+          </button>
+          {menuOpen && <ProfileMenu user={user} />}
+        </div>
       </div>
     </nav>
   );

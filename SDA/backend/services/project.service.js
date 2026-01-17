@@ -77,3 +77,17 @@ export const updateFileTree = async ({ projectId, fileTree }) => {
 
   return project;
 };
+
+// Delete project (only if user belongs to project)
+export const deleteProject = async ({ projectId, userId }) => {
+  if (!projectId) throw new Error("Project ID is required");
+  if (!userId) throw new Error("User ID is required");
+  if (!mongoose.Types.ObjectId.isValid(projectId)) throw new Error("Invalid project ID");
+  if (!mongoose.Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
+
+  const project = await Project.findOne({ _id: projectId, users: userId });
+  if (!project) throw new Error("Project not found or user does not have permission");
+
+  await Project.deleteOne({ _id: projectId });
+  return { success: true };
+};
