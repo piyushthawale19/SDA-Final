@@ -14,13 +14,33 @@
 //   );
 // };
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { UserContext } from "../context/user.context";
 import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
   const { user } = useContext(UserContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    function handleKey(e) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [menuOpen]);
 
   return (
     <nav className="w-full px-6 py-2 flex justify-between items-center border-b bg-white dark:bg-gray-900 shadow">
@@ -45,14 +65,17 @@ const Navbar = () => {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-purple-800 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform hover:scale-110">
             <span className="text-lg font-bold text-white">S</span>
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-white to-purple-400 bg-clip-text text-transparent">
+          <span
+            className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-400 dark:from-purple-300 dark:via-pink-300 dark:to-indigo-500 animate-gradient-shift"
+            style={{ backgroundSize: "200% 200%" }}
+          >
             Smart Developer Assistant
           </span>
         </div>
 
 
       {/* Right: Profile */}
-      <div className="relative">
+      <div className="relative" ref={menuRef}>
         <button
           className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
           onClick={() => setMenuOpen(!menuOpen)}

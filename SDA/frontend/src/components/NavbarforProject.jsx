@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { UserContext } from "../context/user.context";
 import ProfileMenu from "./ProfileMenu";
 import { addCollaborators } from "../screens/Project"; // ✅ Correct import
@@ -6,6 +6,18 @@ import { addCollaborators } from "../screens/Project"; // ✅ Correct import
 const Navbar = () => {
   const { user } = useContext(UserContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   return (
     <nav className="w-full px-6 py-3 flex justify-between items-center border-b bg-white dark:bg-gray-900 shadow">
@@ -25,7 +37,7 @@ const Navbar = () => {
         </button>
 
         {/* Profile Menu */}
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -52,3 +64,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
