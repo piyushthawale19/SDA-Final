@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "../config/axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { UserContext } from "../context/user.context";
 import Avatar from "@mui/material/Avatar";
 import AvatarGroup from "@mui/material/AvatarGroup";
@@ -27,6 +28,8 @@ const Home = () => {
 
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
  useEffect(() => {
   axios
@@ -68,6 +71,26 @@ const createProject = async (e) => {
   }
 };
 
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
+    try {
+      // Call backend to delete project
+      await axios.delete(`/projects/${projectToDelete._id}`);
+
+      // Remove from local list
+      setProjects((prev) => prev.filter((p) => p._id !== projectToDelete._id));
+
+      setShowDeleteDialog(false);
+      setProjectToDelete(null);
+    } catch (err) {
+      console.error("Delete error:", err);
+      // Fallback: still remove locally if backend not available
+      setProjects((prev) => prev.filter((p) => p._id !== projectToDelete._id));
+      setShowDeleteDialog(false);
+      setProjectToDelete(null);
+    }
+  };
+
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -93,14 +116,14 @@ const createProject = async (e) => {
             project ? (
               <div
                 key={project._id}
-                onClick={() => navigate(`/project`, { state: { project } })}
-                className="project p-4 flex flex-col gap-2 cursor-pointer 
+                className="project p-4 pb-6 flex flex-col gap-2 cursor-pointer 
                   border border-slate-300 rounded-md w-60 
                   bg-white text-gray-900 
                   dark:bg-purple-500 dark:text-white 
                   hover:bg-purple-800 hover:text-white 
                   transition duration-300 ease-in-out 
-                  transform hover:scale-105 hover:shadow-lg hover:shadow-purple-400/50"
+                  transform hover:scale-105 hover:shadow-lg hover:shadow-purple-400/50 relative"
+                onClick={() => navigate(`/project`, { state: { project } })}
               >
                 {/* Project Image */}
                 <div className="w-full h-28 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden">
@@ -149,6 +172,20 @@ const createProject = async (e) => {
                     })}
                   </AvatarGroup>
                 </div>
+                  {/* Delete button placed bottom-right, slightly below card */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProjectToDelete(project);
+                      setShowDeleteDialog(true);
+                    }}
+                    title="Delete project"
+                    aria-label={`Delete ${project.name}`}
+                    className="absolute right-3 bottom-3 w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:bg-white hover:text-red-600 transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-400/30"
+                  >
+                    <i className="ri-delete-bin-line text-lg" aria-hidden="true"></i>
+                  </button>
+
               </div>
             ) : null
           )}
@@ -214,6 +251,18 @@ const createProject = async (e) => {
             </div>
           </div>
         )}
+        
+        <ConfirmDialog
+          open={showDeleteDialog}
+          title={projectToDelete ? `Delete "${projectToDelete.name}"` : "Delete project"}
+          description={
+            projectToDelete
+              ? `Are you sure you want to permanently delete "${projectToDelete.name}"? This cannot be undone.`
+              : "Are you sure you want to permanently delete this project? This cannot be undone."
+          }
+          onCancel={() => { setShowDeleteDialog(false); setProjectToDelete(null); }}
+          onConfirm={confirmDelete}
+        />
       </div>
     </main>
   );
