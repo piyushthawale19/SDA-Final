@@ -1,0 +1,130 @@
+/* GitHub Typing Indicator */
+.github-loading-container {
+  background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+  border-left: 3px solid #2ea44f;
+}
+
+.github-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.github-typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background-color: #2ea44f;
+  border-radius: 50%;
+  animation: github-bounce 1.4s infinite ease-in-out both;
+}
+
+.github-typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.github-typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.github-typing-indicator span:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes github-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* GitHub Response Styling */
+.github-response {
+  background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+  border-left: 3px solid #2ea44f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #e1e4e8;
+}
+
+.github-response.success {
+  border-left-color: #2ea44f;
+}
+
+.github-response.error {
+  border-left-color: #f85149;
+}
+
+.github-response.warning {
+  border-left-color: #d29922;
+}
+
+.github-response.info {
+  border-left-color: #58a6ff;
+}
+
+/* GitHub Icon Badge */
+.github-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2ea44f;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.github-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* GitHub Links */
+.github-response a {
+  color: #58a6ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.github-response a:hover {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+
+/* GitHub Code Blocks */
+.github-response code {
+  background: rgba(110, 118, 129, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 85%;
+}
+
+/* GitHub Tables */
+.github-response table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.github-response th,
+.github-response td {
+  border: 1px solid #30363d;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.github-response th {
+  background: #161b22;
+  font-weight: 600;
+}
+
+.github-response tr:nth-child(even) {
+  background: rgba(110, 118, 129, 0.1);
+}

@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import app from "./app.js";
 import projectModel from "./models/project.model.js";
 import { generateResult } from "./services/ai.service.js";
+import { handleGitHubCommand } from "./services/github.service.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -60,6 +61,7 @@ io.on("connection", (socket) => {
       const message = data.message || "";
       socket.broadcast.to(socket.project._id.toString()).emit("project-message", data);
 
+      // Handle @ai commands
       if (message.toLowerCase().includes("@ai")) {
         const prompt = message.replace(/@ai/gi, "").trim();
         const result = await generateResult(prompt);
@@ -68,11 +70,28 @@ io.on("connection", (socket) => {
           sender: { _id: "ai", email: "AI" },
         });
       }
+
+      // Handle @github commands
+      if (message.toLowerCase().includes("@github")) {
+        const command = message.replace(/@github/gi, "").trim();
+        const currentProject = await projectModel.findById(socket.project._id);
+        const result = await handleGitHubCommand(command, currentProject);
+        io.to(socket.project._id.toString()).emit("project-message", {
+          message: JSON.stringify(result),
+          sender: { _id: "github", email: "GitHub" },
+        });
+      }
     } catch (err) {
       console.error("Socket message error:", err.message);
+
+      // Determine which service had the error
+      const isGitHubError = data?.message?.toLowerCase().includes("@github");
       io.to(socket.project._id.toString()).emit("project-message", {
-        message: `AI processing error: ${err.message}`,
-        sender: { _id: "ai", email: "AI" },
+        message: JSON.stringify({
+          text: `${isGitHubError ? "GitHub" : "AI"} processing error: ${err.message}`,
+          type: "error"
+        }),
+        sender: { _id: isGitHubError ? "github" : "ai", email: isGitHubError ? "GitHub" : "AI" },
       });
     }
   });
