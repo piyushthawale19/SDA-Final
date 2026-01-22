@@ -103,7 +103,7 @@ const model = genAI.getGenerativeModel({
        </example>
     
  IMPORTANT : -don't use file name like routes/index.js,
-            - don't use file name like public
+             - don't use file name like public
 
 
   `,

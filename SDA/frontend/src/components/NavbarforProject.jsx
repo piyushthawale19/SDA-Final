@@ -1,7 +1,22 @@
+// import React, { createContext, useContext, useState } from "react";
+
+// // Create the context
+// export const UserContext = createContext();
+
+// // Provider component
+// export const UserProvider = ({ children }) => {
+//   const [user, setUser] = useState(null);
+
+//   return (
+//     <UserContext.Provider value={{ user, setUser }}>
+//       {children}
+//     </UserContext.Provider>
+//   );
+// };
+
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { UserContext } from "../context/user.context";
 import ProfileMenu from "./ProfileMenu";
-import { addCollaborators } from "../screens/Project"; // ✅ Correct import
 
 const Navbar = () => {
   const { user } = useContext(UserContext);
@@ -15,28 +30,62 @@ const Navbar = () => {
       }
     }
 
+    function handleKey(e) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, [menuOpen]);
 
   return (
-    <nav className="w-full px-6 py-3 flex justify-between items-center border-b bg-white dark:bg-gray-900 shadow">
+    <nav className="w-full px-6 py-2 flex justify-between items-center border-b bg-white dark:bg-gray-900 shadow">
       {/* Left: Logo */}
-      <div className="text-xl font-bold cursor-pointer text-purple-700 dark:text-purple-400">
-        MyAppLogo
-      </div>
-
-      {/* Right: Buttons & Profile */}
-      <div className="flex items-center gap-4">
-        {/* Add Collaborators Button */}
-        <button
-          onClick={addCollaborators}
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-md hover:from-purple-700 hover:to-indigo-700 shadow-lg transition-all duration-200"
+      {/* <div className="cursor-pointer">
+  App Logo
+ <img
+  src="/Logo/LogoBlackR.png"
+  alt="logo"
+  className="hidden dark:block w-16 h-16 rounded-md cursor-pointer hover:ring-2 hover:ring-purple-500 object-contain"
+/>
+<img
+  src="/Logo/LogoBV.png"
+  alt="logo"
+  className="block dark:hidden w-16 h-16 rounded-md cursor-pointer hover:ring-2 hover:ring-purple-500 object-contain"
+/>
+</div> */}
+<div
+          className="flex items-center gap-2 cursor-pointer"
+          // onClick={() => navigate("/")}
         >
-          Add Collaborators
-        </button>
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-purple-800 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform hover:scale-110">
+            <span className="text-lg font-bold text-white">S</span>
+          </div>
+          <span
+            className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-400 dark:from-purple-300 dark:via-pink-300 dark:to-indigo-500 animate-gradient-shift"
+            style={{ backgroundSize: "200% 200%" }}
+          >
+            Smart Developer Assistant
+          </span>
+        </div>
 
-        {/* Profile Menu */}
+
+      {/* Right: Actions & Profile */}
+      <div className="flex items-center gap-3">
+        {/* <button
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-gradient-to-r from-gray-800 to-gray-700 dark:from-gray-700 dark:to-gray-600 text-white hover:scale-105 transform transition-shadow duration-150 shadow-md hover:shadow-lg ring-0 focus:outline-none focus:ring-2 focus:ring-purple-400/30"
+          title="Publish to GitHub"
+          aria-label="Publish to GitHub"
+          onClick={() => document.dispatchEvent(new CustomEvent("push-to-github"))}
+        >
+          <i className="ri-github-fill text-lg" aria-hidden="true" />
+          <span className="hidden md:inline text-sm font-medium">Publish</span>
+        </button> */}
+
         <div className="relative" ref={menuRef}>
           <button
             className="flex items-center gap-2 px-3 py-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
@@ -64,4 +113,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

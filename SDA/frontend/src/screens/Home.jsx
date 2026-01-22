@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "../config/axios";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavbarforProject";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { UserContext } from "../context/user.context";
 import Avatar from "@mui/material/Avatar";
