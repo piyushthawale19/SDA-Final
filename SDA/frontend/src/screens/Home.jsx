@@ -7,14 +7,42 @@ import { UserContext } from "../context/user.context";
 import { ThemeContext } from "../context/theme.context";
 import Avatar from "@mui/material/Avatar";
 import AvatarGroup from "@mui/material/AvatarGroup";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { Plus, FolderOpen, Users, Calendar, Trash2, Search, LayoutGrid, ChevronDown, LogOut, Palette, Sun, Moon } from "lucide-react";
+import { getDisplayName } from "../lib/utils";
+import {
+  Plus,
+  FolderOpen,
+  Users,
+  Calendar,
+  Trash2,
+  Search,
+  LayoutGrid,
+  ChevronDown,
+  LogOut,
+  Palette,
+  Sun,
+  Moon,
+} from "lucide-react";
 import AvatarSelector from "../components/AvatarSelector";
 
 const Home = () => {
@@ -49,9 +77,10 @@ const Home = () => {
   const [projectToDelete, setProjectToDelete] = useState(null);
 
   // Filter projects based on search query
-  const filteredProjects = projects.filter((project) =>
-    project?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    project?.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProjects = projects.filter(
+    (project) =>
+      project?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project?.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Handle logout
@@ -64,7 +93,11 @@ const Home = () => {
   // Close profile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (profileMenuOpen && profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+      if (
+        profileMenuOpen &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(e.target)
+      ) {
         setProfileMenuOpen(false);
       }
     };
@@ -81,55 +114,60 @@ const Home = () => {
     };
   }, [profileMenuOpen]);
 
- useEffect(() => {
-  axios
-    .get("/projects/all")
-    .then((res) => {
-      // Sort if backend not sorted by date
-      const sortedProjects = res.data.projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setProjects(sortedProjects);
-    })
-    .catch((err) => console.error(err));
-}, []);
+  useEffect(() => {
+    axios
+      .get("/projects/all")
+      .then((res) => {
+        // Sort if backend not sorted by date
+        const sortedProjects = res.data.projects.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+        setProjects(sortedProjects);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
-// Create Project
-const createProject = async (e) => {
-  e.preventDefault();
-  setCreateError(""); // Clear previous errors
-  
-  if (!projectName.trim()) {
-    setCreateError("Project name is required");
-    return;
-  }
+  // Create Project
+  const createProject = async (e) => {
+    e.preventDefault();
+    setCreateError(""); // Clear previous errors
 
-  const formData = new FormData();
-  formData.append("name", projectName);
-  formData.append("description", projectDesc);
-  if (projectImage) formData.append("image", projectImage);
-
-  try {
-    const res = await axios.post("/projects/create", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    if (res.data.project) {
-      // Prepend new project
-      setProjects((prev) => [res.data.project, ...prev]);
+    if (!projectName.trim()) {
+      setCreateError("Project name is required");
+      return;
     }
 
-    setIsModalOpen(false);
-    setProjectName("");
-    setProjectDesc("");
-    setProjectImage(null);
-    setCreateError("");
-    setActiveTab("projects"); // Switch to projects tab after creation
-  } catch (err) {
-    console.error(err.response?.data || err);
-    // Display user-friendly error message
-    const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to create project. Please try again.";
-    setCreateError(errorMessage);
-  }
-};
+    const formData = new FormData();
+    formData.append("name", projectName);
+    formData.append("description", projectDesc);
+    if (projectImage) formData.append("image", projectImage);
+
+    try {
+      const res = await axios.post("/projects/create", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (res.data.project) {
+        // Prepend new project
+        setProjects((prev) => [res.data.project, ...prev]);
+      }
+
+      setIsModalOpen(false);
+      setProjectName("");
+      setProjectDesc("");
+      setProjectImage(null);
+      setCreateError("");
+      setActiveTab("projects"); // Switch to projects tab after creation
+    } catch (err) {
+      console.error(err.response?.data || err);
+      // Display user-friendly error message
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Failed to create project. Please try again.";
+      setCreateError(errorMessage);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!projectToDelete) return;
@@ -151,16 +189,17 @@ const createProject = async (e) => {
     }
   };
 
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50 dark:from-slate-950 dark:via-purple-950/20 dark:to-slate-950">
       <NavbarSimple />
-      
+
       <div className="flex h-[calc(100vh-64px)]">
         {/* Left Sidebar Navigation */}
         <div className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Navigation</h2>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+              Navigation
+            </h2>
             <nav className="space-y-2">
               {/* Projects Tab */}
               <button
@@ -194,14 +233,21 @@ const createProject = async (e) => {
           </div>
 
           {/* User Profile Menu at Bottom */}
-          <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800 relative" ref={profileMenuRef}>
+          <div
+            className="mt-auto p-6 border-t border-slate-200 dark:border-slate-800 relative"
+            ref={profileMenuRef}
+          >
             <button
               onClick={() => setProfileMenuOpen(!profileMenuOpen)}
               className="w-full flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-all"
             >
               <Avatar
                 alt={user?.name || user?.email}
-                src={user?.avatar && user.avatar !== "/avatars/default1.png" ? user.avatar : undefined}
+                src={
+                  user?.avatar && user.avatar !== "/avatars/default1.png"
+                    ? user.avatar
+                    : undefined
+                }
                 sx={{
                   bgcolor: "#9333ea",
                   color: "#fff",
@@ -213,13 +259,15 @@ const createProject = async (e) => {
               </Avatar>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                  {user?.name || "User"}
+                  {getDisplayName(user)}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                   {user?.email}
                 </p>
               </div>
-              <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`h-4 w-4 text-slate-500 transition-transform ${profileMenuOpen ? "rotate-180" : ""}`}
+              />
             </button>
 
             {/* Profile Dropdown Menu */}
@@ -305,18 +353,22 @@ const createProject = async (e) => {
                   <Card className="border-l-4 border-l-purple-500">
                     <CardHeader className="pb-3">
                       <CardDescription>Total Projects</CardDescription>
-                      <CardTitle className="text-3xl">{projects.length}</CardTitle>
+                      <CardTitle className="text-3xl">
+                        {projects.length}
+                      </CardTitle>
                     </CardHeader>
                   </Card>
                   <Card className="border-l-4 border-l-blue-500">
                     <CardHeader className="pb-3">
                       <CardDescription>Active This Week</CardDescription>
                       <CardTitle className="text-3xl">
-                        {projects.filter(p => {
-                          const weekAgo = new Date();
-                          weekAgo.setDate(weekAgo.getDate() - 7);
-                          return new Date(p.createdAt) > weekAgo;
-                        }).length}
+                        {
+                          projects.filter((p) => {
+                            const weekAgo = new Date();
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            return new Date(p.createdAt) > weekAgo;
+                          }).length
+                        }
                       </CardTitle>
                     </CardHeader>
                   </Card>
@@ -324,7 +376,13 @@ const createProject = async (e) => {
                     <CardHeader className="pb-3">
                       <CardDescription>Collaborators</CardDescription>
                       <CardTitle className="text-3xl">
-                        {new Set(projects.flatMap(p => p.users?.map(u => u._id) || [])).size}
+                        {
+                          new Set(
+                            projects.flatMap(
+                              (p) => p.users?.map((u) => u._id) || [],
+                            ),
+                          ).size
+                        }
                       </CardTitle>
                     </CardHeader>
                   </Card>
@@ -340,21 +398,26 @@ const createProject = async (e) => {
                 </div>
               )}
 
-              {filteredProjects.length === 0 && !searchQuery && projects.length === 0 && (
-                <div className="text-center py-16">
-                  <FolderOpen className="h-16 w-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    No projects yet
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">
-                    Get started by creating your first project
-                  </p>
-                  <Button onClick={() => setActiveTab("new-project")} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Create Project
-                  </Button>
-                </div>
-              )}
+              {filteredProjects.length === 0 &&
+                !searchQuery &&
+                projects.length === 0 && (
+                  <div className="text-center py-16">
+                    <FolderOpen className="h-16 w-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" />
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                      No projects yet
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6">
+                      Get started by creating your first project
+                    </p>
+                    <Button
+                      onClick={() => setActiveTab("new-project")}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Create Project
+                    </Button>
+                  </div>
+                )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map((project) =>
@@ -362,7 +425,9 @@ const createProject = async (e) => {
                     <Card
                       key={project._id}
                       className="group cursor-pointer hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-                      onClick={() => navigate(`/project`, { state: { project } })}
+                      onClick={() =>
+                        navigate(`/project`, { state: { project } })
+                      }
                     >
                       {/* Project Image */}
                       <div className="relative h-48 bg-gradient-to-br from-purple-500 to-blue-600 overflow-hidden">
@@ -371,15 +436,19 @@ const createProject = async (e) => {
                             project.imageId
                               ? `http://localhost:8080/uploads/${project.imageId}`
                               : defaultImages[
-                                  Math.floor(Math.random() * defaultImages.length)
+                                  Math.floor(
+                                    Math.random() * defaultImages.length,
+                                  )
                                 ]
                           }
                           alt={project.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          onError={(e) => (e.target.src = "/Project/default1.jpg")}
+                          onError={(e) =>
+                            (e.target.src = "/Project/default1.jpg")
+                          }
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        
+
                         {/* Delete Button */}
                         <button
                           onClick={(e) => {
@@ -410,14 +479,18 @@ const createProject = async (e) => {
                         <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-500 pt-2">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(project.createdAt).toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}
+                            {new Date(project.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              },
+                            )}
                           </div>
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            {project?.users?.length || 0} member{project?.users?.length !== 1 ? 's' : ''}
+                            {project?.users?.length || 0} member
+                            {project?.users?.length !== 1 ? "s" : ""}
                           </div>
                         </div>
                       </CardContent>
@@ -428,19 +501,22 @@ const createProject = async (e) => {
                           <AvatarGroup max={4} spacing="medium">
                             {project?.users?.map((u) => {
                               const isDefaultAvatar =
-                                !u.avatar || u.avatar === "/avatars/default1.png";
+                                !u.avatar ||
+                                u.avatar === "/avatars/default1.png";
                               return (
                                 <Avatar
                                   key={u._id}
                                   alt={u.name || u.email}
                                   src={isDefaultAvatar ? undefined : u.avatar}
                                   sx={{
-                                    bgcolor: isDefaultAvatar ? "#9333ea" : undefined,
+                                    bgcolor: isDefaultAvatar
+                                      ? "#9333ea"
+                                      : undefined,
                                     color: "#fff",
                                     width: 32,
                                     height: 32,
                                     fontSize: 14,
-                                    border: '2px solid white'
+                                    border: "2px solid white",
                                   }}
                                 >
                                   {isDefaultAvatar
@@ -453,7 +529,7 @@ const createProject = async (e) => {
                         </div>
                       </CardFooter>
                     </Card>
-                  ) : null
+                  ) : null,
                 )}
               </div>
             </div>
@@ -535,16 +611,23 @@ const createProject = async (e) => {
           )}
         </div>
       </div>
-        
+
       <ConfirmDialog
         open={showDeleteDialog}
-        title={projectToDelete ? `Delete "${projectToDelete.name}"` : "Delete project"}
+        title={
+          projectToDelete
+            ? `Delete "${projectToDelete.name}"`
+            : "Delete project"
+        }
         description={
           projectToDelete
             ? `Are you sure you want to permanently delete "${projectToDelete.name}"? This cannot be undone.`
             : "Are you sure you want to permanently delete this project? This cannot be undone."
         }
-        onCancel={() => { setShowDeleteDialog(false); setProjectToDelete(null); }}
+        onCancel={() => {
+          setShowDeleteDialog(false);
+          setProjectToDelete(null);
+        }}
         onConfirm={confirmDelete}
       />
 

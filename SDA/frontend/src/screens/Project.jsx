@@ -158,7 +158,8 @@ const Project = () => {
     };
 
     document.addEventListener("push-to-github", handlePushEvent);
-    return () => document.removeEventListener("push-to-github", handlePushEvent);
+    return () =>
+      document.removeEventListener("push-to-github", handlePushEvent);
   }, [user]);
 
   function WriteAiMessage(message, isLoading) {
@@ -207,16 +208,25 @@ const Project = () => {
     let messageObject;
 
     try {
-      messageObject = JSON.parse(message);
+      // Check if message is already an object
+      if (typeof message === "object") {
+        messageObject = message;
+      } else {
+        messageObject = JSON.parse(message);
+      }
     } catch (err) {
       console.error("Error parsing GitHub message:", err);
-      messageObject = { text: "Error parsing message", type: "error" };
+      // If parsing fails, try to display as plain text
+      messageObject = {
+        text: message || "Error parsing message",
+        type: "error",
+      };
     }
 
     // If this is a loading message
     if (messageObject.text === "Loading..." || isLoading) {
       return (
-        <div className="overflow-auto rounded-sm p-2 github-loading-container text-white">
+        <div className="overflow-auto rounded-lg p-3 github-loading-container text-white">
           <div className="flex items-center space-x-2">
             <div className="github-typing-indicator">
               <span></span>
@@ -234,21 +244,26 @@ const Project = () => {
 
     // For regular GitHub messages
     return (
-      <div className={`overflow-auto rounded-sm p-2 github-response ${typeClass}`}>
+      <div className={`overflow-auto rounded-lg github-response ${typeClass}`}>
         <div className="github-badge">
           <svg viewBox="0 0 16 16" fill="currentColor">
-            <path fillRule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            <path
+              fillRule="evenodd"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path>
           </svg>
           GitHub
         </div>
-        <Markdown
-          children={messageObject.text}
-          options={{
-            overrides: {
-              code: SyntaxHighlightedCode,
-            },
-          }}
-        />
+        <div className="github-content">
+          <Markdown
+            children={messageObject.text}
+            options={{
+              overrides: {
+                code: SyntaxHighlightedCode,
+              },
+            }}
+          />
+        </div>
       </div>
     );
   }
@@ -289,7 +304,7 @@ const Project = () => {
         setMessages((prevMessages) => {
           // Filter out any AI loading messages
           const filteredMessages = prevMessages.filter(
-            (msg) => !(msg.sender._id === "ai" && msg.isLoading)
+            (msg) => !(msg.sender._id === "ai" && msg.isLoading),
           );
           // Add the real AI response
           return [...filteredMessages, data];
@@ -312,7 +327,7 @@ const Project = () => {
         setMessages((prevMessages) => {
           // Filter out any GitHub loading messages
           const filteredMessages = prevMessages.filter(
-            (msg) => !(msg.sender._id === "github" && msg.isLoading)
+            (msg) => !(msg.sender._id === "github" && msg.isLoading),
           );
           // Add the real GitHub response
           return [...filteredMessages, data];
@@ -369,7 +384,7 @@ const Project = () => {
           write(chunk) {
             console.log(chunk);
           },
-        })
+        }),
       );
       await installProcess.exit;
 
@@ -384,7 +399,7 @@ const Project = () => {
           write(chunk) {
             console.log(chunk);
           },
-        })
+        }),
       );
       setRunProcess(tempRunProcess);
 
@@ -444,225 +459,95 @@ const Project = () => {
   }, [messages]);
 
   return (
-    <main className="h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white">
+    <main className="h-screen w-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white overflow-hidden">
       <Navbar />
 
-      <div className="flex flex-grow overflow-hidden">
-        {/* LEFT SECTION */}
-        <section className="left relative flex flex-col min-w-96 bg-slate-300 dark:bg-slate-800 overflow-hidden">
-          <header className="flex justify-between items-center p-2 px-4 w-full bg-slate-100 dark:bg-slate-900 text-gray-900 dark:text-white absolute z-10 top-0">
-            <div className="flex items-center gap-3">
-              <button
-                className="flex gap-2 items-center hover:text-purple-600"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <i className="ri-add-fill mr-1"></i>
-                <p>Add collaborator</p>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsDark((s) => !s)}
-                className="p-2 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-purple-200 dark:hover:bg-purple-700 transition"
-                title="Toggle theme"
-              >
-                {isDark ? (
-                  <i className="ri-moon-fill"></i>
-                ) : (
-                  <i className="ri-sun-line"></i>
-                )}
-              </button>
-
-              <button
-                onClick={() => setIsSidePanelOpen(!isSidePanelOpen)}
-                className="p-2 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-purple-300 dark:hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-90 hover:shadow-lg hover:shadow-purple-500/50"
-              >
-                <i className="ri-group-fill"></i>
-              </button>
-            </div>
-          </header>
-
-          <div className="conversation-area pt-14 flex-grow flex flex-col overflow-hidden">
-            <div
-              ref={messageBox} // ✅ ref attached
-              className="message-box flex-grow flex flex-col gap-1 overflow-auto p-2"
-            >
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`${msg.sender._id === "ai" || msg.sender._id === "github" ? "max-w-80" : "max-w-52"
-                    } ${msg.sender._id === user?._id?.toString() && "ml-auto"
-                    } message flex flex-col p-2 bg-slate-50 dark:bg-slate-700  w-fit rounded-md`}
-                >
-                  <small className="opacity-65 text-xs text-gray-600 dark:text-white">
-                    {msg.sender.email}
-                  </small>
-                  <div className="text-sm">
-                    {msg.sender._id === "ai" ? (
-                      WriteAiMessage(msg.message, msg.isLoading)
-                    ) : msg.sender._id === "github" ? (
-                      WriteGitHubMessage(msg.message, msg.isLoading)
-                    ) : (
-                      <p className="text-gray-900 dark:text-white">
-                        {msg.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="inputField w-full flex">
-              <input
-                type="text"
-                placeholder="Enter message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    send();
-                  }
-                }}
-                className="flex-grow p-2 px-4 border-none outline-none rounded-l-lg bg-slate-50 dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-              <button
-                onClick={send}
-                className="px-5 py-2 bg-purple-600 text-white shadow-md hover:bg-purple-700 active:scale-95 transition-all duration-200"
-              >
-                <i className="ri-send-plane-fill text-lg"></i>
-              </button>
-            </div>
-          </div>
-
-          {/* SIDE PANEL */}
-          <div
-            className={`sidePanel fixed top-0 left-0 h-full w-96 bg-slate-50 dark:bg-slate-900 shadow-lg flex flex-col transition-transform duration-300 ease-in-out z-40 ${isSidePanelOpen ? "translate-x-0" : "-translate-x-full"
-              }`}
-          >
-            <header className="flex justify-between items-center px-4 py-3 bg-slate-200 dark:bg-slate-800 border-b">
-              <h1 className="font-semibold text-lg">Collaborators</h1>
-              <button
-                onClick={() => setIsSidePanelOpen(false)}
-                className="p-2 hover:text-red-500 transition"
-              >
-                <i className="ri-close-fill text-xl"></i>
-              </button>
-            </header>
-
-            <div className="users flex flex-col gap-2 p-3 overflow-y-auto flex-grow">
-              {project?.users?.length ? (
-                project.users.map((collaborator) => (
-                  <div
-                    key={collaborator._id}
-                    onClick={() => handleUserClick(collaborator)}
-                    className={`flex gap-3 items-center cursor-pointer border p-2 rounded-md hover:bg-purple-200 dark:hover:bg-purple-700 hover:border-purple-500 ${activeCollaborator?._id === collaborator._id
-                      ? "bg-slate-200 dark:bg-slate-800 border-purple-500"
-                      : "bg-slate-50 dark:bg-slate-900"
-                      }`}
-                  >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-purple-500 text-white font-bold relative">
-                      {collaborator.email?.[0]?.toUpperCase() || "U"}
-                    </div>
-                    <h1 className="font-semibold text-lg text-gray-900 dark:text-white">
-                      {collaborator.email}
-                    </h1>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 dark:text-gray-300 text-sm text-center mt-4">
-                  No collaborators yet
-                </p>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* RIGHT SECTION */}
-        <section className="right bg-red-50 dark:bg-slate-900 flex-grow flex overflow-hidden">
-          <div className="explorer max-w-64 min-w-52 overflow-auto bg-slate-100 dark:bg-slate-600">
+      <div className="flex flex-1 overflow-hidden">
+        {/* FILE EXPLORER - LEFT SIDE */}
+        <section className="explorer w-64 flex-shrink-0 flex flex-col bg-slate-100 dark:bg-slate-600 border-r border-slate-300 dark:border-slate-700 overflow-hidden">
+          <div className="file-tree flex-1 overflow-auto">
             <div className="file-tree w-full">
               <div className="p-2 bg-slate-200 dark:bg-slate-700 border-b border-slate-300 dark:border-slate-600">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">File Explorer</h3>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  File Explorer
+                </h3>
               </div>
               {fileTree && typeof fileTree === "object"
                 ? Object.keys(fileTree).map((file) => (
-                  <button
-                    key={file}
-                    onClick={() => {
-                      setCurrentFile(file);
-                      setOpenFiles([...new Set([...openFiles, file])]);
-                    }}
-                    className="tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 dark:bg-slate-700 w-full text-gray-900 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors"
-                  >
-                    <span className="text-xl">{getFileIcon(file)}</span>
-                    <p className={`font-medium text-sm ${getFileColor(file)}`}>{file}</p>
-                  </button>
-                ))
+                    <button
+                      key={file}
+                      onClick={() => {
+                        setCurrentFile(file);
+                        setOpenFiles([...new Set([...openFiles, file])]);
+                      }}
+                      className="tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 dark:bg-slate-700 w-full text-gray-900 dark:text-white hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      <span className="text-xl">{getFileIcon(file)}</span>
+                      <p
+                        className={`font-medium text-sm ${getFileColor(file)}`}
+                      >
+                        {file}
+                      </p>
+                    </button>
+                  ))
                 : null}
             </div>
           </div>
         </section>
 
         {/* CENTER SECTION - CODE EDITOR & PREVIEW */}
-        <section className="center flex-grow flex flex-col overflow-hidden bg-red-50 dark:bg-slate-900">
-          <div className="code-editor flex flex-col flex-grow relative">
-            {/* Top Navigation Bar - Always Visible */}
-            <div className="top flex justify-between w-full bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700 flex-shrink-0">
+        <section className="center flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-900">
+          <div className="code-editor flex flex-col flex-1 overflow-hidden">
+            {/* Top Navigation Bar */}
+            <div className="top flex justify-between w-full bg-slate-200 dark:bg-slate-800 border-b border-slate-300 dark:border-slate-700">
               <div className="flex items-center">
                 {/* Code/Preview Toggle Buttons */}
                 <button
                   onClick={() => setViewMode("code")}
-                  className={`px-6 py-2 font-semibold text-sm transition-all ${viewMode === "code"
-                    ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                    }`}
+                  className={`px-6 py-2 font-semibold text-sm transition-all ${
+                    viewMode === "code"
+                      ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
                 >
                   <i className="ri-code-s-slash-line mr-1"></i>
                   Code
                 </button>
                 <button
                   onClick={() => setViewMode("preview")}
-                  className={`px-6 py-2 font-semibold text-sm transition-all ${viewMode === "preview"
-                    ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                    }`}
+                  className={`px-6 py-2 font-semibold text-sm transition-all ${
+                    viewMode === "preview"
+                      ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400 border-b-2 border-purple-600"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
                 >
                   <i className="ri-play-circle-line mr-1"></i>
                   Preview
                 </button>
               </div>
 
-              <div className="actions flex items-center gap-2 mr-2">
-                <button
-                  onClick={() => setIsDark((s) => !s)}
-                  className="p-2 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-purple-200 dark:hover:bg-purple-700 transition"
-                  title="Toggle theme"
-                >
-                  {isDark ? (
-                    <i className="ri-moon-fill"></i>
-                  ) : (
-                    <i className="ri-sun-line"></i>
-                  )}
-                </button>
+              <div className="actions flex items-center gap-1 mr-4">
                 <button
                   onClick={handleDownloadZip}
                   className="download-btn"
                   title="Download project as ZIP"
                 >
                   <span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"></path>
                     </svg>
-                    Download
                   </span>
                 </button>
                 {viewMode === "preview" && (
-                  <button
-                    onClick={handleRun}
-                    className="run-btn"
-                  >
+                  <button onClick={handleRun} className="run-btn">
                     <i className="ri-play-fill"></i>
                     <span>Run</span>
                   </button>
@@ -670,16 +555,17 @@ const Project = () => {
               </div>
             </div>
 
-            {/* Open Files Tabs - Only show in Code view */}
+            {/* Open Files Tabs - Sticky */}
             {viewMode === "code" && openFiles.length > 0 && (
-              <div className="files-tabs flex bg-slate-100 dark:bg-slate-700 border-b border-slate-300 dark:border-slate-600 overflow-x-auto flex-shrink-0 shadow-sm">
+              <div className="files-tabs flex bg-slate-100 dark:bg-slate-700 border-b border-slate-300 dark:border-slate-600 overflow-x-auto">
                 {openFiles.map((file, index) => (
                   <div
                     key={index}
-                    className={`flex items-center w-fit gap-2 px-3 py-2 cursor-pointer border-r border-slate-300 dark:border-slate-600 ${currentFile === file
-                      ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400"
-                      : "bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-slate-300 dark:hover:bg-slate-600"
-                      }`}
+                    className={`flex items-center w-fit gap-2 px-3 py-2 cursor-pointer border-r border-slate-300 dark:border-slate-600 ${
+                      currentFile === file
+                        ? "bg-slate-50 dark:bg-slate-900 text-purple-600 dark:text-purple-400"
+                        : "bg-slate-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-slate-300 dark:hover:bg-slate-600"
+                    }`}
                   >
                     <span className="text-base">{getFileIcon(file)}</span>
                     <button
@@ -692,12 +578,12 @@ const Project = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         const updatedFiles = openFiles.filter(
-                          (f) => f !== file
+                          (f) => f !== file,
                         );
                         setOpenFiles(updatedFiles);
                         if (currentFile === file) {
                           setCurrentFile(
-                            updatedFiles.length ? updatedFiles[0] : null
+                            updatedFiles.length ? updatedFiles[0] : null,
                           );
                         }
                       }}
@@ -710,8 +596,8 @@ const Project = () => {
               </div>
             )}
 
-            {/* Content Area - Scrollable */}
-            <div className="bottom flex flex-1 overflow-auto min-h-0">
+            {/* Content Area */}
+            <div className="bottom flex flex-1 overflow-auto">
               {viewMode === "code" ? (
                 // CODE VIEW
                 fileTree[currentFile] ? (
@@ -737,12 +623,15 @@ const Project = () => {
                         dangerouslySetInnerHTML={{
                           __html: fileTree[currentFile]?.file?.contents
                             ? hljs.highlight(
-                              "javascript",
-                              fileTree[currentFile].file.contents
-                            ).value
+                                "javascript",
+                                fileTree[currentFile].file.contents,
+                              ).value
                             : "",
                         }}
-                        style={{ whiteSpace: "pre-wrap", paddingBottom: "1rem" }}
+                        style={{
+                          whiteSpace: "pre-wrap",
+                          paddingBottom: "1rem",
+                        }}
                       />
                     </pre>
                   </div>
@@ -751,7 +640,9 @@ const Project = () => {
                     <div className="text-center text-gray-500 dark:text-gray-400">
                       <i className="ri-file-code-line text-6xl mb-4"></i>
                       <p className="text-lg font-semibold">No file selected</p>
-                      <p className="text-sm mt-2">Select a file from the explorer to view its contents</p>
+                      <p className="text-sm mt-2">
+                        Select a file from the explorer to view its contents
+                      </p>
                     </div>
                   </div>
                 )
@@ -769,14 +660,21 @@ const Project = () => {
                           placeholder="Preview URL"
                         />
                       </div>
-                      <iframe src={iframeUrl} className="w-full h-full border-none"></iframe>
+                      <iframe
+                        src={iframeUrl}
+                        className="w-full h-full border-none"
+                      ></iframe>
                     </>
                   ) : (
                     <div className="flex items-center justify-center flex-grow">
                       <div className="text-center text-gray-500 dark:text-gray-400 max-w-md p-8">
                         <i className="ri-play-circle-line text-6xl mb-4"></i>
-                        <p className="text-lg font-semibold mb-2">Preview Not Running</p>
-                        <p className="text-sm mb-6">Click the Run button to start the preview</p>
+                        <p className="text-lg font-semibold mb-2">
+                          Preview Not Running
+                        </p>
+                        <p className="text-sm mb-6">
+                          Click the Run button to start the preview
+                        </p>
                         <button
                           onClick={handleRun}
                           className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex items-center gap-2 mx-auto"
@@ -829,10 +727,12 @@ const Project = () => {
                 <div
                   key={index}
                   className={`${
-                    msg.sender._id === "ai" ? "max-w-80" : "max-w-52"
+                    msg.sender._id === "ai" || msg.sender._id === "github"
+                      ? "max-w-80"
+                      : "max-w-52"
                   } ${
                     msg.sender._id === user?._id?.toString() && "ml-auto"
-                  } message flex flex-col p-2 bg-slate-50 dark:bg-slate-700  w-fit rounded-md`}
+                  } message flex flex-col p-2 bg-slate-50 dark:bg-slate-700 w-fit rounded-md`}
                 >
                   <small className="opacity-65 text-xs text-gray-600 dark:text-white">
                     {msg.sender.email}
@@ -840,6 +740,8 @@ const Project = () => {
                   <div className="text-sm">
                     {msg.sender._id === "ai" ? (
                       WriteAiMessage(msg.message, msg.isLoading)
+                    ) : msg.sender._id === "github" ? (
+                      WriteGitHubMessage(msg.message, msg.isLoading)
                     ) : (
                       <p className="text-gray-900 dark:text-white">
                         {msg.message}
@@ -857,7 +759,7 @@ const Project = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     send();
                   }
@@ -947,10 +849,11 @@ const Project = () => {
                       return updated;
                     })
                   }
-                  className={`flex items-center gap-3 p-3 rounded cursor-pointer border hover:bg-purple-100 dark:hover:bg-purple-700 transition hover:border-purple-500 ${Array.from(selectedUserId).indexOf(u._id) !== -1
-                    ? "bg-slate-200 dark:bg-slate-800 border-purple-500"
-                    : "bg-slate-50 dark:bg-slate-900"
-                    }`}
+                  className={`flex items-center gap-3 p-3 rounded cursor-pointer border hover:bg-purple-100 dark:hover:bg-purple-700 transition hover:border-purple-500 ${
+                    Array.from(selectedUserId).indexOf(u._id) !== -1
+                      ? "bg-slate-200 dark:bg-slate-800 border-purple-500"
+                      : "bg-slate-50 dark:bg-slate-900"
+                  }`}
                 >
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-md">
                     {u.email?.[0]?.toUpperCase() || "U"}
@@ -975,17 +878,24 @@ const Project = () => {
       {/* Popup Notification */}
       {popupMessage && (
         <div
-          className={`fixed top-20 right-5 px-6 py-3 rounded-lg shadow-lg font-semibold transition-all duration-500 z-50 text-white ${popupType === "info"
-            ? "bg-blue-500"
-            : popupType === "success"
-              ? "bg-green-500"
-              : "bg-red-500"
-            }`}
+          className={`fixed top-20 right-5 px-6 py-3 rounded-lg shadow-lg font-semibold transition-all duration-500 z-50 text-white ${
+            popupType === "info"
+              ? "bg-blue-500"
+              : popupType === "success"
+                ? "bg-green-500"
+                : "bg-red-500"
+          }`}
         >
           <div className="flex items-center gap-2">
-            {popupType === "info" && <i className="ri-information-line text-xl"></i>}
-            {popupType === "success" && <i className="ri-checkbox-circle-line text-xl"></i>}
-            {popupType === "error" && <i className="ri-error-warning-line text-xl"></i>}
+            {popupType === "info" && (
+              <i className="ri-information-line text-xl"></i>
+            )}
+            {popupType === "success" && (
+              <i className="ri-checkbox-circle-line text-xl"></i>
+            )}
+            {popupType === "error" && (
+              <i className="ri-error-warning-line text-xl"></i>
+            )}
             <span>{popupMessage}</span>
           </div>
         </div>
