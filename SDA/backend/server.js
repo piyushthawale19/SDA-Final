@@ -59,12 +59,42 @@ io.on("connection", (socket) => {
   socket.on("project-message", async (data) => {
     try {
       const message = data.message || "";
-      socket.broadcast.to(socket.project._id.toString()).emit("project-message", data);
+      socket.broadcast
+        .to(socket.project._id.toString())
+        .emit("project-message", data);
 
       // Handle @ai commands
       if (message.toLowerCase().includes("@ai")) {
         const prompt = message.replace(/@ai/gi, "").trim();
         const result = await generateResult(prompt);
+
+        // Parse the AI response to check if it contains a fileTree
+        try {
+          const parsedResult = JSON.parse(result.toString());
+          if (parsedResult.fileTree) {
+            // Update the project's fileTree in the database
+            const currentProject = await projectModel.findById(
+              socket.project._id,
+            );
+            if (currentProject) {
+              // Merge new files with existing fileTree
+              const updatedFileTree = {
+                ...currentProject.fileTree,
+                ...parsedResult.fileTree,
+              };
+              await projectModel.findByIdAndUpdate(socket.project._id, {
+                fileTree: updatedFileTree,
+              });
+              console.log(
+                `Updated fileTree for project ${socket.project._id} with ${Object.keys(parsedResult.fileTree).length} files`,
+              );
+            }
+          }
+        } catch (parseErr) {
+          // If parsing fails, it's just a text response, no fileTree to save
+          console.log("AI response is plain text, no fileTree to update");
+        }
+
         io.to(socket.project._id.toString()).emit("project-message", {
           message: result.toString(),
           sender: { _id: "ai", email: "AI" },
@@ -89,9 +119,12 @@ io.on("connection", (socket) => {
       io.to(socket.project._id.toString()).emit("project-message", {
         message: JSON.stringify({
           text: `${isGitHubError ? "GitHub" : "AI"} processing error: ${err.message}`,
-          type: "error"
+          type: "error",
         }),
-        sender: { _id: isGitHubError ? "github" : "ai", email: isGitHubError ? "GitHub" : "AI" },
+        sender: {
+          _id: isGitHubError ? "github" : "ai",
+          email: isGitHubError ? "GitHub" : "AI",
+        },
       });
     }
   });

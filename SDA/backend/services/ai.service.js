@@ -16,6 +16,12 @@ const model = genAI.getGenerativeModel({
     You never miss the edge cases and always write code that is scalable and maintainable. 
     In your code you always handle the errors and exceptions.
 
+    IMPORTANT RULES:
+    - ALWAYS create a README.md file in every project with proper documentation
+    - The README.md should include: project description, installation steps, usage instructions, and features
+    - Don't use file names like routes/index.js
+    - Don't use file names like public
+
     Examples: 
 
     <example>
@@ -24,6 +30,11 @@ const model = genAI.getGenerativeModel({
 
     "text": "this is you fileTree structure of the express server",
     "fileTree": {
+        "README.md": {
+            file: {
+                contents: "# Express Application\n\n## Description\nA simple Express.js application.\n\n## Installation\n\`\`\`bash\nnpm install\n\`\`\`\n\n## Usage\n\`\`\`bash\nnpm start\n\`\`\`\n\n## Features\n- Basic Express server\n- Running on port 3000"
+            }
+        },
         "app.js": {
             file: {
                 contents: "
@@ -101,10 +112,6 @@ const model = genAI.getGenerativeModel({
        }
        
        </example>
-    
- IMPORTANT : -don't use file name like routes/index.js,
-             - don't use file name like public
-
 
   `,
 });

@@ -16,6 +16,7 @@
 
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { UserContext } from "../context/user.context";
+import { getDisplayName } from "../lib/utils";
 import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
@@ -58,21 +59,20 @@ const Navbar = () => {
   className="block dark:hidden w-16 h-16 rounded-md cursor-pointer hover:ring-2 hover:ring-purple-500 object-contain"
 />
 </div> */}
-<div
-          className="flex items-center gap-2 cursor-pointer"
-          // onClick={() => navigate("/")}
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-purple-800 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform hover:scale-110">
-            <span className="text-lg font-bold text-white">S</span>
-          </div>
-          <span
-            className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-400 dark:from-purple-300 dark:via-pink-300 dark:to-indigo-500 animate-gradient-shift"
-            style={{ backgroundSize: "200% 200%" }}
-          >
-            Smart Developer Assistant
-          </span>
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        // onClick={() => navigate("/")}
+      >
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-purple-800 flex items-center justify-center shadow-lg shadow-purple-500/50 transition-transform hover:scale-110">
+          <span className="text-lg font-bold text-white">S</span>
         </div>
-
+        <span
+          className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-400 dark:from-purple-300 dark:via-pink-300 dark:to-indigo-500 animate-gradient-shift"
+          style={{ backgroundSize: "200% 200%" }}
+        >
+          Smart Developer Assistant
+        </span>
+      </div>
 
       {/* Right: Actions & Profile */}
       <div className="flex items-center gap-3">
@@ -97,12 +97,7 @@ const Navbar = () => {
               className="w-8 h-8 rounded-md object-cover border"
             />
             <span className="hidden sm:block text-sm font-medium dark:text-white">
-              {user?.name
-                ? user.name.charAt(0).toUpperCase() + user.name.slice(1)
-                : user?.email
-                ? user.email.split("@")[0].charAt(0).toUpperCase() +
-                  user.email.split("@")[0].slice(1)
-                : "Guest"}
+              {getDisplayName(user)}
             </span>
           </button>
           {menuOpen && <ProfileMenu user={user} />}
